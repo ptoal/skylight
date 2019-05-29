@@ -70,6 +70,16 @@
     - linux-common
     - ansible-tower
 
+- name: Configure Linux Servers
+  hosts: linux
+  become: True
+  gather_facts: True
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags: linux-server
+  roles:
+    - linux-common
+    
 - name: Configure Windows Workstation
   hosts: windows_workstations
   gather_facts: True
