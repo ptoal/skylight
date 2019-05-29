@@ -405,24 +405,24 @@
     instance_type: "{{ ec2_linux_instance_type }}"
     exact_count: 1
     count_tag:
-      Name: "{{ name_prefix }}-docs"
+      Name: "{{ name_prefix + '-s' + item + '-linux1'}}"
       App: AnsibleWorkshop
     instance_tags:
-      Name: "{{ name_prefix }}-docs"
+      Name: "{{ name_prefix + '-s' + item + '-linux1'}}"
       App: AnsibleWorkshop
       Workshop: "{{ name_prefix }}"
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
-      short_name: 'docs'
+      short_name: "{{ 's' + item + '-win1' }}"
     image: "{{ ec2_ami_ids[ec2_linux_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
     user_data: "{{ lookup('template', 'linux_student_ec2_user_data.j2') }}"
     assign_public_ip: yes
-  with_sequence: count=1
+  with_sequence: count={{user_count}}
   register: linux1_jobs
   async: 7200
   poll: 0
