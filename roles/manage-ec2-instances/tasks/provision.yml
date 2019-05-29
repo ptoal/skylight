@@ -218,6 +218,34 @@
       - proto: all
         cidr_ip: "{{ ptr_zone_cidr }}"
 
+- name: Linux | Create Linux security group
+  ec2_group:
+    name: "{{ name_prefix }}-linuxsg"
+    description: "Linux SG"
+    vpc_id: "{{ ec2_vpc_id }}"
+    region: "{{ ec2_region }}"
+    tags:
+      Username: "{{ skylight_user }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+      Students: "{{ user_count }}"
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "0.0.0.0/0"
+      - proto: all
+        cidr_ip: "{{ ptr_zone_cidr }}"
+  
+
 ################### Build Instances ###################
 
 - name: DomainController | Launch instance
@@ -370,6 +398,35 @@
   async: 7200
   poll: 0
 
+- name: Linux | Launch Instance
+  ec2:
+    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    group: "{{ name_prefix }}-linuxsg"
+    instance_type: "{{ ec2_linux_instance_type }}"
+    exact_count: 1
+    count_tag:
+      Name: "{{ name_prefix }}-docs"
+      App: AnsibleWorkshop
+    instance_tags:
+      Name: "{{ name_prefix }}-docs"
+      App: AnsibleWorkshop
+      Workshop: "{{ name_prefix }}"
+      Username: "{{ skylight_user }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+      Students: "{{ user_count }}"
+      short_name: 'docs'
+    image: "{{ ec2_ami_ids[ec2_linux_instance_ami_type] }}"
+    wait: true
+    region: "{{ ec2_region }}"
+    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
+    user_data: "{{ lookup('template', 'linux_student_ec2_user_data.j2') }}"
+    assign_public_ip: yes
+  with_sequence: count=1
+  register: docs_jobs
+  async: 7200
+  poll: 0
+
 - name: Docs | Launch Instance
   ec2:
     key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
@@ -419,6 +476,13 @@
   async_status: jid="{{ item.ansible_job_id }}"
   register: docs_instances
   until: docs_instances.finished
+  retries: 300
+  with_items: "{{ docs_jobs.results }}"
+
+- name: Wait for Linux instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: linux_instances
+  until: linux_instances.finished
   retries: 300
   with_items: "{{ docs_jobs.results }}"
 
@@ -569,6 +633,16 @@
     ansible_host: "{{ item.public_ip }}"
     private_ip: "{{ item.private_ip }}"
     groups: docs
+  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+
+- name: Linux | Add new instance to host group
+  add_host:
+    hostname: 'linux'
+    ansible_user: "{{ root_user }}"
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    ansible_host: "{{ item.public_ip }}"
+    private_ip: "{{ item.private_ip }}"
+    groups: linux
   with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
 
 - name: DomainController | Add new instance to host group
