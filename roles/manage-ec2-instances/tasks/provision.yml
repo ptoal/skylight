@@ -398,7 +398,7 @@
   async: 7200
   poll: 0
 
-- name: Linux | Launch Instance
+- name: Linux | Launch Instance 1
   ec2:
     key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
     group: "{{ name_prefix }}-linuxsg"
@@ -423,7 +423,7 @@
     user_data: "{{ lookup('template', 'linux_student_ec2_user_data.j2') }}"
     assign_public_ip: yes
   with_sequence: count=1
-  register: docs_jobs
+  register: linux1_jobs
   async: 7200
   poll: 0
 
@@ -484,7 +484,7 @@
   register: linux_instances
   until: linux_instances.finished
   retries: 300
-  with_items: "{{ docs_jobs.results }}"
+  with_items: "{{ linux1_jobs.results }}"
 
 - name: Wait for DC instance creation to complete
   async_status: jid="{{ item.ansible_job_id }}"
@@ -538,6 +538,15 @@
     timeout: 320
     state: started
   with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+
+- name: Linux | Wait for SSH to come up
+  wait_for:
+    host: "{{ item.public_ip }}"
+    port: 22
+    delay: 1
+    timeout: 320
+    state: started
+  with_items: "{{ linux_instances.results | map(attribute='tagged_instances') | list }}"
 
 - name: DomainController | Wait for WinRM to come up
   wait_for:
