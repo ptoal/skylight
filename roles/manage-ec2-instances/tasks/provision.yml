@@ -643,7 +643,7 @@
     ansible_host: "{{ item.public_ip }}"
     private_ip: "{{ item.private_ip }}"
     groups: linux
-  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+  with_items: "{{ linux_instances.results | map(attribute='tagged_instances') | list }}"
 
 - name: DomainController | Add new instance to host group
   add_host:
