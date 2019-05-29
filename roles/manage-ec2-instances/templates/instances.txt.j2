@@ -26,6 +26,8 @@ ansible_ssh_user={{ root_user }}
 {%     if "windc" in host -%}
 {%     elif "gitlab" in host -%}
 {%     elif "docs" in host -%}
+{%     elif "linux" in host %}
+{{ host }} ansible_host={{ hostvars[host].ansible_host }} 
 {%     elif "tower" in host %}
 {{ host }} ansible_host={{ hostvars[host].ansible_host }} 
 {%     else %}
