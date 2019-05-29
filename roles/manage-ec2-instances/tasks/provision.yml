@@ -637,13 +637,13 @@
 
 - name: Linux | Add new instance to host group
   add_host:
-    hostname: 'linux'
+    hostname: "s{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}-linux1"
+    ansible_host: "{{ item.item.public_ip }}"
+    private_ip: "{{ item.item.private_ip }}"
     ansible_user: "{{ root_user }}"
     ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    ansible_host: "{{ item.public_ip }}"
-    private_ip: "{{ item.private_ip }}"
     groups: linux
-  with_items: "{{ linux_instances.results | map(attribute='tagged_instances') | list }}"
+  with_items: "{{ linux_instances.results }}"
 
 - name: DomainController | Add new instance to host group
   add_host:
