@@ -90,6 +90,14 @@
     state: present
   with_sequence: count={{ user_count }}
 
+- name: Create DNS A record for Linux Servers
+  win_ad_dnsrecord:
+    hostname: s{{ item }}-linux1
+    zone: "{{ dns_domain_name }}"
+    ipaddr: "{{ hostvars['s' + item + '-linux1']['private_ip'] }}"
+    state: present
+  with_sequence: count={{ user_count }}
+
 - name: Create DNS A record for Windows
   win_ad_dnsrecord:
     hostname: s{{ item }}-win1
