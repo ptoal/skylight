@@ -422,7 +422,7 @@
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'linux_student_ec2_user_data.j2') }}"
+    user_data: "{{ lookup('template', 'linux_ec2_user_data.j2') }}"
     assign_public_ip: yes
   with_sequence: count={{user_count}}
   register: linux1_jobs
