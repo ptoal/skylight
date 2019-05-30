@@ -237,6 +237,17 @@
   retries: 20
   delay: 10
 
+- name: Remove Linux security group
+  ec2_group:
+    name: "{{ name_prefix }}-linuxsg"
+    region: "{{ ec2_region }}"
+    vpc_id: "{{ ec2_vpc_id }}"
+    state: absent
+  register: result
+  until: result is success
+  retries: 20
+  delay: 10
+
 - name: Remove ssh key pair for workshop {{ name_prefix }}
   ec2_key:
     name: "{{ skylight_user }}-{{ name_prefix }}-key"
