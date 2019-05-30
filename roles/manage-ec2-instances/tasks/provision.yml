@@ -416,12 +416,12 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Student: "{{ user_prefix + item }}"
       Students: "{{ user_count }}"
-      short_name: "{{ 's' + item + '-win1' }}"
+      short_name: "{{ 's' + item + '-linux1' }}"
     image: "{{ ec2_ami_ids[ec2_linux_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'linux_student_ec2_user_data.j2') }}"
+    user_data: "{{ lookup('template', 'linux_ec2_user_data.j2') }}"
     assign_public_ip: yes
   with_sequence: count={{user_count}}
   register: linux1_jobs
