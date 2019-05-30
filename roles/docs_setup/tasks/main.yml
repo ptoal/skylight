@@ -55,6 +55,14 @@
     src: docs/lab_guide/
     dest: /usr/share/nginx/html/
   register: copycontent
+  when: not linuxlab
+
+- name: Copy lab guides to server
+  copy:
+    src: docs/linux_lab_guide/
+    dest: /usr/share/nginx/html/
+  register: copycontent
+  when: linuxlab
 
 - name: Build HTML Docs
   command: asciidoc -d book -v -o {{ item }}.html {{ item }}.adoc
