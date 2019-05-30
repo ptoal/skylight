@@ -81,6 +81,7 @@
   ec2_key:
     name: "{{ skylight_user }}-{{ name_prefix }}-key"
     region: "{{ ec2_region }}"
+    force: false
   register: create_key
 
 - name: Save the private key
