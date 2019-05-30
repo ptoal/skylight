@@ -1,6 +1,6 @@
 - name: Create User Group
   group:
-    name: "{{ username }}"
+    name: "{{ student }}"
     state: present
   tags:
     - user_accounts
@@ -9,11 +9,11 @@
 - name: Create User Account
   user:
     createhome: yes
-    group: "{{ username }}"
-    name: "{{ username }}"
+    group: "{{ student }}"
+    name: "{{ student }}"
     shell: /bin/bash
     state: present
-    password: "{{ admin_password_hash }}"
+    password: "{{ user_password_hash }}"
   tags:
     - user_accounts
     - users

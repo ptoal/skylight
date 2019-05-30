@@ -79,6 +79,7 @@
   tags: linux-server
   roles:
     - linux-common
+    - user_accounts
     
 - name: Configure Windows Workstation
   hosts: windows_workstations
