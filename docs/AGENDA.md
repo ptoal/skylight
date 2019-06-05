@@ -2,7 +2,7 @@ Windows Ansible Workshop
 
 -------------------------
 
-9:05 a.m.   What is Ansible and The Ansible Way
+9:10 a.m.   What is Ansible and The Ansible Way
 
 9:15 a.m.   How Ansible Works and its Key Components
 
