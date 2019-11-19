@@ -1,7 +1,7 @@
 ---
 - name: check if we need to do installer things
   uri:
-    url: https://localhost/api/v1/ping/
+    url: https://localhost/api/v2/ping/
     method: GET
     user: admin
     password: "{{ towerpass }}"
@@ -40,7 +40,7 @@
 
 - name: wait for tower to be up
   uri:
-    url: https://localhost/api/v1/ping/
+    url: https://localhost/api/v2/ping/
     method: GET
     user: admin
     password: "{{ towerpass }}"
@@ -54,7 +54,7 @@
 
 - name: Post license key
   uri:
-    url: https://localhost/api/v1/config/
+    url: https://localhost/api/v2/config/
     method: POST
     user: admin
     password: "{{ towerpass }}"
