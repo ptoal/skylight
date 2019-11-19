@@ -47,21 +47,21 @@ Within Visual Studio Code, create a new directory in your git repo and create a 
 
 In the Explorer accordion you should have a 'student#' section where you previously made iis_basic.
 
-image::images/3-vscode-create-folders.png[title="Student Playbooks",width=1000]
+image::images/5-vscode-existing-folders.png[title="Student Playbooks",width=400]
 
 === Step 2: Create a folder called *iis_advanced* and a file called `site.yml`
 
-Hover over the 'student#' section and click on the 'New Folder' button
+Hover over the 'student#' section and click the 'New Folder' button
 
-Type iis_advanced and hit enter.  Then click on that folder so it is selected.
+Type iis_advanced and hit enter.  Then click that folder so it is selected.
 
-Hover over the 'student#' section again and click on the 'New File' button.
+Hover over the 'student#' section again and click the 'New File' button.
 
 Type site.yml and hit enter.
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
-image::images/5-vscode-create-folders.png[title="Empty site.yml",width=400]
+image::images/5-vscode-create-folders.png[title="Empty site.yml",width=1000]
 
 
 === Step 3:
@@ -88,6 +88,7 @@ Add a play definition and some variables to your playbook.  These include addtio
 === Step 4:
 
 Add a new task called *install IIS*.
+After writing the playbook, click `File` > `Save` to save your changes.
 
 [source,bash]
 ----
@@ -141,11 +142,11 @@ After that, you will define a task to start the IIS service.
 === Step 1:
 Create a `templates` directory in your project directory and create a template as follows:
 
-Ensure your *iis_advanced folder* is highlighted and then hover over the 'student#' section and click on the 'New Folder' button
+Ensure your *iis_advanced folder* is highlighted and then hover over the 'student#' section and click the 'New Folder' button
 
-Type templates and hit enter.  Then click on that folder so it is selected.
+Type templates and hit enter.  Then click that folder so it is selected.
 
-Hover over the 'templates' folder and click on the 'New File' button.
+Hover over the 'templates' folder and click the 'New File' button.
 
 Type index.html.j2 and hit enter.
 
@@ -167,7 +168,7 @@ You should now have an editor open in the right pane that can be used for creati
 image::images/5-vscode-template.png[title="index.html template",width=1000]
 
 === Step 2:
-Add to your playbook, `site.yml`, opening your firewall ports and writing the template.  Use single quotes for win_template in order to not escape the forward slash.
+Edit back your playbook, `site.yml`, by opening your firewall ports and writing the template.  Use single quotes for `win_template` in order to not escape the forward slash.
 
 [source,bash]
 ----
@@ -204,6 +205,9 @@ used in Ansible to transform data inside a template expression, i.e. filters.
 
 There are any number of reasons we often need to restart a service/process including the deployment of a configuration file, installing a new package, etc.  There are really two parts to this Section; adding a handler to the playbook and calling the handler after the a task.  We will start with the former.
 
+The `handlers` block should start after a one-level indentation, that is, two spaces.
+It should align with the `tasks` block.
+
 === Step 1:
 Define a handler.
 
@@ -237,7 +241,7 @@ Click `File` -> `Save All` to save the files you've written
 
 image::images/5-vscode-iis-yaml-2.png[title="site.yml part 2"]
 
-Click on the Source Code icon, type in a commit message such as 'Adding basic playbook', and click the check box above.
+Click the Source Code icon (1), type in a commit message such as 'Adding advanced playbook' (2), and click the check box above (3).
 
 image::images/5-commit.png[title="Commit site.yml"]
 
@@ -319,12 +323,12 @@ Now let's take a second look to make sure everything looks the way you intended.
 === Step 1:
 
 Before we can create our Job Template, you must first go resync your Project again.  So do that now.  
-____
-``*NOTE*: You must do this anytime you create a new 'base' playbook file that you will be selecting via a Job Template.  The new file must be synced to Tower before it will become available in the Job Template playbook dropdown.``
-____
+
+[NOTE]
+You must do this anytime you create a new 'base' playbook file that you will be selecting via a Job Template.  The new file must be synced to Tower before it will become available in the Job Template playbook dropdown.
 
 === Step 2:
-To test this playbook, we need to create a new Job Template to run this playbook.  So goto 'Template' and click 'Add' again.
+To test this playbook, we need to create a new Job Template to run this playbook.  So go to 'Template' and click 'Add' and select `Job Template` to create a second job template.
 
 Complete the form using the following values
 
@@ -339,7 +343,7 @@ Complete the form using the following values
 |LIMIT|Windows
 |OPTIONS
 a|
-- [*] Use Fact Cache
+- [*] USE FACT CACHE
 |===
 
 
@@ -361,11 +365,11 @@ Complete the survey form with following values
 |ANSWER VARIABLE NAME|iis_test_message
 |ANSWER TYPE|Text
 |MINIMUM/MAXIMUM LENGTH| Use the defaults
-|DEFAULT ANSWER| Be creative, keep it clean, we're all professionals here
+|DEFAULT ANSWER| _Be creative, keep it clean, we're all professionals here_
 |===
 
 
-image::images/6-survey.png[title="Survey Form",width=1000]
+image::images/5-survey.png[title="Survey Form",width=500]
 
 
 
@@ -395,15 +399,15 @@ Alternatively, if you haven't navigated away from the job templates creation pag
 
 === Step 2:
 
-Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
+Click the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
 
 === Step 3:
 
 When prompted, enter your desired test message
 
-After it launches, you should be redirected and can watch the output of the job in realtime. 
+After it launches, you should be redirected and can watch the output of the job in real time. 
 
-Once your job is sucessful, navigate to your new websites (replace # with your student number)
+Once your job is successful, navigate to your new websites (replace # with your student number)
 
 [source,bash]
 ----
