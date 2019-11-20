@@ -1,11 +1,11 @@
 ---
 - name: Create the environment file
   copy:
-  dest: /tmp/ansible-tower-setup-{{ towerversion }}/install_vars.yml
-  content: |
-    redhat_aws_rhui_repos:
-      - rhel-server-rhui-rhscl-7-rpms
-      - rhel-7-server-rhui-extras-rpms
+    dest: /tmp/ansible-tower-setup-{{ towerversion }}/install_vars.yml
+    content: |
+      redhat_aws_rhui_repos:
+        - rhel-server-rhui-rhscl-7-rpms
+        - rhel-7-server-rhui-extras-rpms
 
 - name: check if we need to do installer things
   uri:
