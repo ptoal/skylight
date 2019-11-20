@@ -1,4 +1,12 @@
 ---
+- name: Create the environment file
+  copy:
+  dest: /tmp/ansible-tower-setup-{{ towerversion }}/install_vars.yml
+  content: |
+    redhat_aws_rhui_repos:
+      - rhel-server-rhui-rhscl-7-rpms
+      - rhel-7-server-rhui-extras-rpms
+
 - name: check if we need to do installer things
   uri:
     url: https://localhost/api/v2/ping/
@@ -71,7 +79,7 @@
   when: towerchk != towerversion
 
 - name: run the tower installer
-  shell: ./setup.sh chdir=/tmp/ansible-tower-setup-bundle-{{ towerversion }}.el{{ ansible_distribution_major_version }}
+  shell: ./setup.sh -e "@install_vars.yml" chdir=/tmp/ansible-tower-setup-bundle-{{ towerversion }}.el{{ ansible_distribution_major_version }}
   when: towerchk not in towerversion
 
 - name: wait for tower to be up
