@@ -4,6 +4,9 @@
 
 - include_tasks: find_ami_ids.yml
 
+- include_tasks: ssh_key_setup.yml
+  when: ec2_key_name is not defined or ec2_private_key is not defined
+
 ################### Create Resources ###################
 - name: Create AWS VPC {{ name_prefix }}-vpc
   ec2_vpc_net:
@@ -76,19 +79,6 @@
   register: routetable
   until: routetable is not failed
   retries: 5
-
-- name: Create ssh key pair for workshop {{ name_prefix }}
-  ec2_key:
-    name: "{{ skylight_user }}-{{ name_prefix }}-key"
-    region: "{{ ec2_region }}"
-  register: create_key
-
-- name: Save the private key
-  copy:
-    content: "{{ create_key.key.private_key }}"
-    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    mode: '0400'
-  when: create_key.changed
 
 ################### Create Security Groups ###################
 - name: Tower | Create Ansible Control Node security group
@@ -230,7 +220,7 @@
 
 - name: DomainController | Launch instance
   ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    key_name: "{{ ec2_key_name }}"
     group: "{{ name_prefix }}-windcsg"
     instance_type: "{{ ec2_windc_instance_type }}"
     exact_count: 1
@@ -260,7 +250,7 @@
 
 - name: Windows | Launch instance 1
   ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    key_name: "{{ ec2_key_name }}"
     group:
       - "{{ name_prefix }}-windowssg"
     instance_type: "{{ ec2_windows_instance_type }}"
@@ -292,7 +282,7 @@
 
 - name: Workstation | Launch instance
   ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    key_name: "{{ ec2_key_name }}"
     group:
       - "{{ name_prefix }}-windowssg"
     instance_type: "{{ ec2_windows_workstation_instance_type }}"
@@ -324,7 +314,7 @@
 
 - name: Launch Tower Instance
   ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    key_name: "{{ ec2_key_name }}"
     group: "{{ name_prefix }}-towersg"
     instance_type: "{{ ec2_tower_instance_type }}"
     exact_count: 1
@@ -355,7 +345,7 @@
 
 - name: GitLab | Launch Instance
   ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    key_name: "{{ ec2_key_name }}"
     group: "{{ name_prefix }}-gitlabsg"
     instance_type: "{{ ec2_gitlab_instance_type }}"
     exact_count: 1
@@ -385,7 +375,7 @@
 
 - name: Docs | Launch Instance
   ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    key_name: "{{ ec2_key_name }}"
     group: "{{ name_prefix }}-docssg"
     instance_type: "{{ ec2_docs_instance_type }}"
     exact_count: 1
@@ -466,7 +456,7 @@
   ec2_win_password:
     region: '{{ ec2_region }}'
     instance_id: "{{ item.id }}"
-    key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    key_data: "{{ ec2_private_key }}"
     wait: yes
     wait_timeout: 300
   with_items: "{{ dc_instances.results | map(attribute='tagged_instances') | list }}"
@@ -477,7 +467,7 @@
   ec2_win_password:
     region: '{{ ec2_region }}'
     instance_id: "{{ item.id }}"
-    key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    key_data: "{{ ec2_private_key }}"
     wait: yes
     wait_timeout: 300
   with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
@@ -488,7 +478,7 @@
   ec2_win_password:
     region: '{{ ec2_region }}'
     instance_id: "{{ item.id }}"
-    key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    key_data: "{{ ec2_private_key }}"
     wait: yes
     wait_timeout: 300
   with_items: "{{ windows_instances.results | map(attribute='tagged_instances') | list }}"
@@ -501,7 +491,7 @@
   add_host:
     hostname: "s{{ item.tags.Student | regex_replace('[^0-9]', '') }}-tower"
     ansible_user: "{{ root_user }}"
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    ansible_ssh_private_key_file: "{{ ec2_private_key_file }}"
     ansible_host: "{{ item.public_ip }}"
     private_ip: "{{ item.private_ip }}"
     tower_license: "{{ tower_license }}"
@@ -513,7 +503,7 @@
   add_host:
     hostname: 'gitlab'
     ansible_user: "{{ root_user }}"
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    ansible_ssh_private_key_file: "{{ ec2_private_key_file }}"
     ansible_host: "{{ item.public_ip }}"
     private_ip: "{{ item.private_ip }}"
     groups: gitlab
@@ -523,7 +513,7 @@
   add_host:
     hostname: 'docs'
     ansible_user: "{{ root_user }}"
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    ansible_ssh_private_key_file: "{{ ec2_private_key_file }}"
     ansible_host: "{{ item.public_ip }}"
     private_ip: "{{ item.private_ip }}"
     groups: docs

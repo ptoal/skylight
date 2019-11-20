@@ -1,0 +1,22 @@
+---
+# Generate a private key if necessary, or use a Tower Machine Credential if provided.
+
+- set_fact:
+    ec2_key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+
+- name: Create ssh key pair for workshop {{ name_prefix }}
+  ec2_key:
+    name: "{{ ec2_key_name }}"
+    region: "{{ ec2_region }}"
+  register: create_key
+
+- name: Save the generated private key 
+  copy:
+    content: "{{ create_key.key.private_key }}"
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    mode: '0400'
+    when: create_key.changed
+
+- set_fact:
+    ec2_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    ec2_private_key: "{{ lookup('file', '{{ ec2_private_key_file }}') }}"
