@@ -1,7 +1,8 @@
 ---
 # Generate a private key if necessary, or use a Tower Machine Credential if provided.
 
-- set_fact:
+- name: Set ec2 Key Name
+  set_fact:
     ec2_key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
 
 - name: Create ssh key pair for workshop {{ name_prefix }}
